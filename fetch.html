@@ -7,12 +7,28 @@
     <link rel="stylesheet" href="fetch.css">
 </head>
 <body>
-   
-   <h1>Fetch</h1>
-   <input type="text" id="name">
-   <input type="number" id="gifts">
-   <button onclick="addGifts()">Add toyes</button>
-   <ul id="output"></ul>
-   <script src="fetch.js"></script>
+   <div class="container">
+    <h1>Santa Management System</h1>
+    <div>
+        <input type="text" id="namekid">
+        <input type="text" id="nametoy">
+        <input type="number" id="numtoy">
+        <button onclick="addGifts()">Add toyes</button>
+    </div>
+
+ 
+    <div class="button-group">
+         <button id="clear">Refrech list</button>
+         <button id="clearStorage">Clear slede</button>
+    </div>
+    <ul id="output"></ul>
+    <div class="saved-gifts">
+     <h2>Saved gift requested toyes</h2>
+     <div id="savedOutput"></div>
+    </div>
+ 
+    <script src="fetch.js"></script>
+   </div>
+
 </body>
 </html>
