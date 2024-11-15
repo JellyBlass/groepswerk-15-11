@@ -30,7 +30,7 @@ function deleteGifts(id) {
     .catch(e => console.error('Error deleting gift:', e));
 }
 
-function addPost () {
+function addGifts () {
     const newPost = {
         title: document.getElementById('name').value,
         views: parseInt(document.getElementById('gifts').value),
