@@ -9,8 +9,8 @@ function fetchdata() {
         data => data.forEach(smurf => {
             output.innerHTML += `<div class="post-item">
             <li>${smurf.id} ${smurf.title} </li>
-            <button onclick="deletePost('${smurf.id}')">Delete</button>
-            <button onclick="updatePost('${smurf.id})">Update</button>
+            <button onclick="deletePost('${smurf.id}')" style="float:right;">Delete</button>
+            <button onclick="updatePost('${smurf.id})" style="float:right;" >Update</button>
             </div>`;
             
         })
