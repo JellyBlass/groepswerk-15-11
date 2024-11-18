@@ -1,26 +1,23 @@
 {
   "posts": [
     {
-      "id": "1",
-      "title": "a title",
-      "views": 100
-    },
-    {
-      "id": "2",
-      "title": "another title",
-      "views": 200
+      "id": "a6c2",
+      "title": "Bruh",
+      "views": 41,
+      "likes": 1,
+      "createdAt": 1731918773
     }
   ],
   "comments": [
     {
       "id": "1",
       "text": "a comment about post 1",
-      "postId": "1"
+      "postId": null
     },
     {
       "id": "2",
       "text": "another comment about post 1",
-      "postId": "1"
+      "postId": null
     }
   ],
   "profile": {

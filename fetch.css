@@ -1,10 +1,11 @@
 .post-item {
-    margin: 10px 0;
+    margin: 10px 0%;
     padding: 10px;
     border-radius: 10px;
     border: 1px solid #ddd;
     display: flex;
     justify-content: space-around;
+    width: 300px;
 }
 
 .flex-container {
@@ -12,16 +13,16 @@
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
-    align-items: normal;
-    align-content: normal;
+    align-items: center;
+    align-content: center;
   }
   
-  .flex-items:nth-child(1) {
+.flex-items:nth-child(1) {
     display: block;
     flex-grow: 0;
     flex-shrink: 1;
-    flex-basis: auto;
-    align-self: auto;
+    flex-basis: content;
+    align-self: center;
     order: 0;
     width: 50%;
   }
@@ -29,4 +30,24 @@
 body {
     background: rgb(10,122,93);
     background: linear-gradient(135deg, rgba(10,122,93,1) 0%, rgba(194,56,82,1) 60%, rgba(227,51,56,1) 100%);
+    color: white;
+}
+
+.box {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin: 10px 0%;
+    padding: 10px;
+}
+
+input, button {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin: 10px 0%;
+    padding: 10px;
+}
+
+img {
+    width: 200px;
+    height: 200x;
 }
