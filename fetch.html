@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="fetch.css">
 </head>
@@ -15,20 +15,27 @@
     </div>
     <div class="flex-container">
         <div class="flex-items">
-            <input type="text" id="title">
-            <input type="number" id="views">
-            <input type="number" id="likes">
+            <input type="text" id="namekid">
+            <input type="text" id="location">
+            <input type="number" id="goodieScore">
         </div>
     </div>
     <div class="flex-container">
         <div class="flex-items">
-            <button onclick="addPost()">Add Post</button>
+            <button onclick="addChild()">Add Child</button>
         </div>
     </div>
     <div class="flex-container">
         <div class="flex-items box">
-            <h2>Bag o' child and presents</h2>
+            <h2>Bag o' database saved</h2>
+            <button id="refresh">Refresh the page</button>
             <div id="output"></div>
+            <div>
+                <h2>Bag o' locally saved</h2>
+                <button id="clearStorage">Clear the sack</button>
+                <div id="savedGifts"></div>
+            </div>
+            
         </div>
     </div>
     <footer>
@@ -38,5 +45,7 @@
             </div>
         </div>
     </footer>
+
+    <script src="fetch.js"></script>
 </body>
 </html>

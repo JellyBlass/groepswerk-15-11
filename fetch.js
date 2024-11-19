@@ -1,6 +1,7 @@
-const url = 'http://localhost:3000/posts';
+const url = 'http://localhost:3000/children';
 const output = document.getElementById('output');
 const savedOutput = document.getElementById('savedGifts');
+
 
 function fetchdata() 
 {
@@ -8,20 +9,147 @@ function fetchdata()
     fetch(url)
     .then(res => res.json())
     .then(data => {
-            if(data.length ===0)
-            {
-                const noGiftsMessage = document.createElement('div');
-                noGiftsMessage.className = 'no-gifts-message';
-                noGiftsMessage.textContent = 'No gift lists available. Add your fist gift list so santa knows what you want.';
-                output.appendChild(noGiftsMessage);
-                return;
-            }
-            
-        })
+        console.log(data.length);
+        for(i = 0; i < data.length; i++){
+            console.log(data[i]);
+        }
+        if(data.length === 0)
+        {
+            console.log("Ik ben erin");
+            const noGiftsMessage = document.createElement('div');
+            noGiftsMessage.className = 'no-gifts-message';
+            noGiftsMessage.textContent = 'No gift lists available. Add your fist gift list so santa knows what you want.';
+            output.appendChild(noGiftsMessage);
+            return;
+        }
+        const sortedData = data.sort((a, b) => b.timestamp - a.timestamp);
+            sortedData.forEach(post => {
+                output.innerHTML += `
+                    <div class="post-item" id="post-${post.id}">
+                        <span class="post-content">${post.child} (${post.location}) (goodie: ${post.goodieScore || 0})</span>
+                        <span class="post-content">${post.child} krijgt: ${post.gift}</span>
+                        <div class="edit-form" style="display: none;">
+                            <input type="text" class="edit-title" value="${post.child}">
+                            <input type="text" class="edit-views" value="${post.location}">
+                            <input type="number" class="edit-likes" value="${post.goodieScore || 0}">
+                            <button class="smallbutton" onclick="saveEdit('${post.id}')">S</button>
+                            <button class="smallbutton" onclick="cancelEdit('${post.id}')">X</button>
+                        </div>
+                        <div class="add-gifts" style="display: none;">
+                            <input type="text" class="giftGoHere">
+                            <button class="smallbutton" onclick="addGiftToKid('${post.id}', '${post.gift}')">S</button>
+                            <button class="smallbutton" onclick="endEditing('${post.id}')">X</button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="addGiftsToKid('${post.id}')">Geschenken toevoegen</button>
+                            <button onclick="editPost('${post.id}')">Edit</button>
+                            <button onclick="saveToLocal('${post.id}', '${post.child}', '${post.location}', ${post.goodieScore || 0}, '${post.gift}')">Save</button>
+                            <button onclick="deleteGifts('${post.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });  
+    })
     
     .catch(e => console.log(e));
 }
-fetchdata();
+
+function saveEdit(id) {
+    // Get the edited values
+    const postDiv = document.getElementById(`post-${id}`);
+    const newTitle = postDiv.querySelector('.edit-title').value;
+    const newViews = postDiv.querySelector('.edit-views').value;
+    const newLikes = parseInt(postDiv.querySelector('.edit-likes').value);
+    const newGift = postDiv.querySelector('.giftGoHere').value;
+        // Create updated post object
+        const updatedPost = {
+            child: newTitle,
+            location: newViews,
+            goodieScore: newLikes,
+            gift: newGift
+        };
+    
+        // Send PUT request to update the post
+        fetch(`${url}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedPost)
+        })
+        .then(res => res.json())
+        .then(() => {
+            // Refresh the posts display
+            fetchdata();
+        })
+        .catch(e => console.error('Error updating post:', e)); 
+}
+
+function addGiftToKid(id, giftsAlreadyAdded) {
+    // Get the edited values
+    const postDiv = document.getElementById(`post-${id}`);
+    const newTitle = postDiv.querySelector('.edit-title').value;
+    const newViews = postDiv.querySelector('.edit-views').value;
+    const newLikes = parseInt(postDiv.querySelector('.edit-likes').value);
+    let newGift = postDiv.querySelector('.giftGoHere').value;
+
+    console.log(giftsAlreadyAdded);
+        // Create updated post object
+        if(!giftsAlreadyAdded == ""){
+            newGift = giftsAlreadyAdded + ", " + newGift
+        }
+        const updatedPost = {
+            child: newTitle,
+            location: newViews,
+            goodieScore: newLikes,
+            gift: newGift
+        };
+    
+        // Send PUT request to update the post
+        fetch(`${url}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedPost)
+        })
+        .then(res => res.json())
+        .then(() => {
+            // Refresh the posts display
+            fetchdata();
+        })
+        .catch(e => console.error('Error updating post:', e)); 
+}
+
+function addGiftsToKid(id) {
+    // Show edit form and hide content for the selected post
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.add-gifts').style.display = 'block';
+    postDiv.querySelector('.button-group').style.display = 'none';
+}
+
+function endEditing(id) {
+    // Hide edit form and show content
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.add-gifts').style.display = 'none';
+    postDiv.querySelector('.button-group').style.display = 'block';
+}
+
+function editPost(id) {
+    // Show edit form and hide content for the selected post
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.post-content').style.display = 'none';
+    postDiv.querySelector('.edit-form').style.display = 'block';
+    postDiv.querySelector('.button-group').style.display = 'none';
+}
+
+function cancelEdit(id) {
+    // Hide edit form and show content
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.post-content').style.display = 'block';
+    postDiv.querySelector('.edit-form').style.display = 'none';
+    postDiv.querySelector('.button-group').style.display = 'block';
+}
 
 const button = document.getElementById('clear');
 
@@ -30,11 +158,17 @@ document.getElementById('clearStorage').addEventListener('click', () =>
     if(confirm('Are you sure you want to clear all the gift requests ?'))
     {
         localStorage.removeItem('savedGifts');
+        const noGiftsMessage = document.createElement('div');
+        noGiftsMessage.className = 'no-gifts-message';
+        noGiftsMessage.textContent = 'No gift list saved yet';
+        savedOutput.appendChild(noGiftsMessage);
+        return;
         loadSavedGifts();
     }
 })
-document.getElementById('clear').addEventListener('click', fetchdata);
+document.getElementById('refresh').addEventListener('click', fetchdata);
 
+//delete functie
 function deleteGifts(id) {
     fetch(`${url}/${id}`, {
         method: 'DELETE'
@@ -43,11 +177,12 @@ function deleteGifts(id) {
     .catch(e => console.error('Error deleting gift:', e));
 }
 
-function addGifts () {
+function addChild() {
     const newPost = {
         child: document.getElementById('namekid').value,
-        toy: parseInt(document.getElementById('nametoy')),
-        numtoy: parseInt(document.getElementById('gifts').value),
+        location: document.getElementById('location').value,
+        goodieScore: parseInt(document.getElementById('goodieScore').value),
+        gift: ""
     };
     fetch(url, {
         method: 'POST',
@@ -60,8 +195,8 @@ function addGifts () {
     .then(() => {
         fetchdata();
         document.getElementById('namekid').value ='';
-        document.getElementById('nametoy').value = '';
-        document.getElementById('gifts').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('goodieScore').value = '';
     })
     .catch(e => console.error('Error adding gift list:', e));
 }
@@ -70,69 +205,77 @@ function loadSavedGifts()
 {
     try
     {
-        const savedGifts = JSON.parse(localStorage.getItem('savedGifts' || '[]'));
-        savedOutput.innerHTML = '';
-
-        if (savedGifts.length === 0)
-        {
-            const noGiftsMessage = document.createElement('div');
-            noGiftsMessage.className = 'no-gifts-message';
-            noGiftsMessage.textContent = 'No gift list saved yet';
-            savedOutput.appendChild(noGiftsMessage);
-            return;
+        try {
+            const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
+            savedOutput.innerHTML = '';
+            
+            if (savedGifts.length === 0) {
+                const noPostsMessage = document.createElement('div');
+                noPostsMessage.className = 'no-posts-message';
+                noPostsMessage.textContent = 'No saved posts yet!';
+                savedOutput.appendChild(noPostsMessage);
+                return;
+            }
+    
+            // Sort saved posts by timestamp in descending order
+            //savedGifts.sort((a, b) => b.timestamp - a.timestamp);
+            savedGifts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-item';
+                postDiv.innerHTML = `
+                    <span>${post.title} (${post.views}) (${post.likes || 0})</span>
+                    <span>${post.giftstoShow}</span>
+                    <button onclick="removeFromSaved('${post.id}')">Remove</button>
+                `;
+                savedOutput.appendChild(postDiv);
+            });
+        } catch (error) {
+            console.error('Error loading saved posts:', error);
+            localStorage.setItem('savedGifts', '[]');
         }
-
-    }catch (error)
-    {
-        console.error('Error loading saved gift requests:', error);
+        }
+    catch (error) {
+        console.error('Error loading saved posts:', error);
         localStorage.setItem('savedGifts', '[]');
     }
 }
 
-function saveToLocal(giftId, namekid, nametoy, numtoy)
-{
-    try
-    {
-        const gift = 
-        {
-            id: giftId,
-            namekid: namekid,
-            nametoy: nametoy,
-            numtoy: numtoy
+function saveToLocal(postId, namekid, nametoy, numtoy, gifts) {
+    try {
+        const post = {
+            id: postId,  // postId is received as a string
+            title: namekid,
+            views: nametoy,
+            likes: numtoy,
+            giftstoShow: gifts
         };
-
         const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
         
-        if(!savedGifts.some(g => g.id === gift.id))
-        {
-            savedGifts.push(gift);
+        if (!savedGifts.some(p => p.id === post.id)) {  // Comparing strings with strings
+            savedGifts.push(post);
             localStorage.setItem('savedGifts', JSON.stringify(savedGifts));
             loadSavedGifts();
+        } else {
+            alert('This post is already saved!');
         }
-        else
-        {
-            alert('This gift request has already been saved!');
-        }
-    }
-    catch(error)
-    {
-        console.error('Error saving gift list', error);
+    } catch (error) {
+        console.error('Error saving post:', error);
     }
 }
-function removeFromSaved(giftId)
-{
-    try
-    {
+function removeFromSaved(postId) {
+
+    try {
         const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
-        const giftIdString = String(giftId);
-        const updatedGifts = savedGifts.filter(gifts => gift.id !== giftIdString);
-        localStorage.setItem('savedGifts', JSON.stringify(updatedGifts));
+        // Convert postId to string for consistent comparison
+        const postIdString = String(postId);
+        const updatedPosts = savedGifts.filter(post => post.id !== postIdString);
+        localStorage.setItem('savedGifts', JSON.stringify(updatedPosts));
         loadSavedGifts();
-    }
-    catch (error)
-    {
-        console.error('Error removing saved gift request:', error);
+    } catch (error) {
+        console.error('Error removing saved post:', error);
     }
 }
+
+
 fetchdata();
 loadSavedGifts();
