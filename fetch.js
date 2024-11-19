@@ -151,11 +151,11 @@ function saveToLocal(postId, postTitle, postViews, postLikes, timestamp) {
             likes: postLikes || 0,
             timestamp: timestamp
         };
-        const savedPosts = JSON.parse(localStorage.getItem('savedPosts') || '[]');
+        const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
         
-        if (!savedPosts.some(p => p.id === post.id)) {  // Comparing strings with strings
-            savedPosts.push(post);
-            localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
+        if (!savedGifts.some(p => p.id === post.id)) {  // Comparing strings with strings
+            savedGifts.push(post);
+            localStorage.setItem('savedGifts', JSON.stringify(savedGifts));
             loadSavedGifts();
         } else {
             alert('This post is already saved!');
@@ -167,11 +167,11 @@ function saveToLocal(postId, postTitle, postViews, postLikes, timestamp) {
 function removeFromSaved(postId) {
 
     try {
-        const savedPosts = JSON.parse(localStorage.getItem('savedPosts') || '[]');
+        const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
         // Convert postId to string for consistent comparison
         const postIdString = String(postId);
-        const updatedPosts = savedPosts.filter(post => post.id !== postIdString);
-        localStorage.setItem('savedPosts', JSON.stringify(updatedPosts));
+        const updatedPosts = savedGifts.filter(post => post.id !== postIdString);
+        localStorage.setItem('savedGifts', JSON.stringify(updatedPosts));
         loadSavedGifts();
     } catch (error) {
         console.error('Error removing saved post:', error);
