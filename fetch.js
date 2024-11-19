@@ -22,31 +22,22 @@ function fetchdata()
             output.appendChild(noGiftsMessage);
             return;
         }
-        if (data.length > 0){
-            for(i = 0; i < data.length; i++){
-                output.innerHTML += `<div class="post-item">
-                    <div>${data[i].child} gets ${data[i].toy}: ${data[i].numtoy} times</div>
-                    <button onclick="deleteGifts('${data[i].id}')" style="float:right;">Delete</button>
-                    <button onclick="updatePost('${data[i].id})" style="float:right;" >Update</button>
-                </div>`;
-            }
-        }
         const sortedData = data.sort((a, b) => b.timestamp - a.timestamp);
             sortedData.forEach(post => {
                 output.innerHTML += `
                     <div class="post-item" id="post-${post.id}">
-                        <span class="post-content">${post.title} (${post.views}) (${post.likes || 0})</span>
+                        <span class="post-content">${post.child} (${post.toy}) (${post.numtoy || 0})</span>
                         <div class="edit-form" style="display: none;">
-                            <input type="text" class="edit-title" value="${post.title}">
-                            <input type="number" class="edit-views" value="${post.views}">
-                            <input type="number" class="edit-likes" value="${post.likes || 0}">
+                            <input type="text" class="edit-title" value="${post.child}">
+                            <input type="text" class="edit-views" value="${post.toy}">
+                            <input type="number" class="edit-likes" value="${post.numtoy || 0}">
                             <button class="smallbutton" onclick="saveEdit('${post.id}')">S</button>
                             <button class="smallbutton" onclick="cancelEdit('${post.id}')">X</button>
                         </div>
                         <div class="button-group">
                             <button onclick="editPost('${post.id}')">Edit</button>
-                            <button onclick="saveToLocal('${post.id}', '${post.title}', ${post.views}, ${post.likes || 0}, ${post.timestamp})">Save</button>
-                            <button onclick="deletePost('${post.id}')">Delete</button>
+                            <button onclick="saveToLocal('${post.id}', '${post.child}', ${post.toy}, ${post.numtoy || 0}, ${post.timestamp})">Save</button>
+                            <button onclick="deleteGifts('${post.id}')">Delete</button>
                         </div>
                     </div>
                 `;
@@ -126,7 +117,7 @@ function loadSavedGifts()
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post-item';
                 postDiv.innerHTML = `
-                    <span>${post.title} (${post.views}) (${post.likes || 0})</span>
+                    <span>${post.child} (${post.toy}) (${post.numtoy || 0})</span>
                     <button onclick="removeFromSaved('${post.id}')">Remove</button>
                 `;
                 savedOutput.appendChild(postDiv);
@@ -142,14 +133,13 @@ function loadSavedGifts()
     }
 }
 
-function saveToLocal(postId, postTitle, postViews, postLikes, timestamp) {
+function saveToLocal(postId, namekid, nametoy, numtoy) {
     try {
         const post = {
             id: postId,  // postId is received as a string
-            title: postTitle,
-            views: postViews,
-            likes: postLikes || 0,
-            timestamp: timestamp
+            title: namekid,
+            views: nametoy,
+            likes: numtoy
         };
         const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
         
