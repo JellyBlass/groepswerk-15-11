@@ -7,28 +7,36 @@
     <link rel="stylesheet" href="fetch.css">
 </head>
 <body>
-   <div class="container">
-    <h1>Santa Management System</h1>
-    <div>
-        <input type="text" id="namekid">
-        <input type="text" id="nametoy">
-        <input type="number" id="numtoy">
-        <button onclick="addGifts()">Add toyes</button>
+    <div class="flex-container">
+        <div class="flex-items">
+            <h1>SMS v1.0.1</h1>
+            <img src="images/santa.png" alt="santa">
+        </div>
     </div>
-
- 
-    <div class="button-group">
-         <button id="clear">Refrech list</button>
-         <button id="clearStorage">Clear slede</button>
+    <div class="flex-container">
+        <div class="flex-items">
+            <input type="text" id="title">
+            <input type="number" id="views">
+            <input type="number" id="likes">
+        </div>
     </div>
-    <ul id="output"></ul>
-    <div class="saved-gifts">
-     <h2>Saved gift requested toyes</h2>
-     <div id="savedOutput"></div>
+    <div class="flex-container">
+        <div class="flex-items">
+            <button onclick="addPost()">Add Post</button>
+        </div>
     </div>
- 
-    <script src="fetch.js"></script>
-   </div>
-
+    <div class="flex-container">
+        <div class="flex-items box">
+            <h2>Bag o' child and presents</h2>
+            <div id="output"></div>
+        </div>
+    </div>
+    <footer>
+        <div class="flex-container">
+            <div class="flex-items">
+                <div>© 2024 SANTA SMS v1.0.1 - all rights reserved. - Workshop Station - The North Pole - Earth</div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

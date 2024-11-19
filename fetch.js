@@ -16,7 +16,6 @@ function fetchdata()
                 output.appendChild(noGiftsMessage);
                 return;
             }
-        
             
         })
     
