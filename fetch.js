@@ -30,7 +30,27 @@ function fetchdata()
                     <button onclick="updatePost('${data[i].id})" style="float:right;" >Update</button>
                 </div>`;
             }
-        }  
+        }
+        const sortedData = data.sort((a, b) => b.timestamp - a.timestamp);
+            sortedData.forEach(post => {
+                output.innerHTML += `
+                    <div class="post-item" id="post-${post.id}">
+                        <span class="post-content">${post.title} (${post.views}) (${post.likes || 0})</span>
+                        <div class="edit-form" style="display: none;">
+                            <input type="text" class="edit-title" value="${post.title}">
+                            <input type="number" class="edit-views" value="${post.views}">
+                            <input type="number" class="edit-likes" value="${post.likes || 0}">
+                            <button class="smallbutton" onclick="saveEdit('${post.id}')">S</button>
+                            <button class="smallbutton" onclick="cancelEdit('${post.id}')">X</button>
+                        </div>
+                        <div class="button-group">
+                            <button onclick="editPost('${post.id}')">Edit</button>
+                            <button onclick="saveToLocal('${post.id}', '${post.title}', ${post.views}, ${post.likes || 0}, ${post.timestamp})">Save</button>
+                            <button onclick="deletePost('${post.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });  
     })
     
     .catch(e => console.log(e));
@@ -88,90 +108,73 @@ function loadSavedGifts()
 {
     try
     {
-        const savedGifts = JSON.parse(localStorage.getItem('savedGifts' || '[]'));
-        savedOutput.innerHTML = '';
-        console.log(savedGifts.length);
-        if (savedGifts.length > 0)
-        {
-            for(i = 0; i < savedGifts.length; i++){
-                savedOutput.innerHTML += `<div class="post-item">
-                    <div>[${savedGifts[i].id}]${savedGifts[i].child} gets ${savedGifts[i].toy}: ${savedGifts[i].numtoy} times</div>
-                    <button onclick="removeFromSaved('${savedGifts[i].id}')" style="float:right;">Delete</button>
-                    <button onclick="updatePost('${savedGifts[i].id})" style="float:right;" >Update</button>
-                </div>`;
+        try {
+            const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
+            savedOutput.innerHTML = '';
+            
+            if (savedGifts.length === 0) {
+                const noPostsMessage = document.createElement('div');
+                noPostsMessage.className = 'no-posts-message';
+                noPostsMessage.textContent = 'No saved posts yet!';
+                savedOutput.appendChild(noPostsMessage);
+                return;
             }
+    
+            // Sort saved posts by timestamp in descending order
+            savedGifts.sort((a, b) => b.timestamp - a.timestamp);
+            savedGifts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-item';
+                postDiv.innerHTML = `
+                    <span>${post.title} (${post.views}) (${post.likes || 0})</span>
+                    <button onclick="removeFromSaved('${post.id}')">Remove</button>
+                `;
+                savedOutput.appendChild(postDiv);
+            });
+        } catch (error) {
+            console.error('Error loading saved posts:', error);
+            localStorage.setItem('savedGifts', '[]');
         }
-
-    }catch (error)
-    {
-        if(error = "TypeError: Cannot read properties of null (reading 'length')"){
-            localStorage.removeItem('savedGifts');
-            const noGiftsMessage = document.createElement('div');
-            noGiftsMessage.className = 'no-gifts-message';
-            noGiftsMessage.textContent = 'No gift list saved yet';
-            savedOutput.appendChild(noGiftsMessage);
-            return;
         }
-        console.error('Error loading saved gift requests:', error);
+    catch (error) {
+        console.error('Error loading saved posts:', error);
         localStorage.setItem('savedGifts', '[]');
-
     }
 }
 
-function saveToLocal(giftId)
-{
-    try
-    {
-        const gift = 
-        {
-            id: giftId => {
-                try{
-                    if(savedGifts.length > 0){
-                        giftId = savedGifts.length + 1;
-                    }
-                }
-                catch(e){
-                    console.log(e);
-                }
-                return this.giftId;
-            },
-            child: document.getElementById('namekid').value,
-            toy: document.getElementById('nametoy').value,
-            numtoy: parseInt(document.getElementById('gifts').value)
+function saveToLocal(postId, postTitle, postViews, postLikes, timestamp) {
+    try {
+        const post = {
+            id: postId,  // postId is received as a string
+            title: postTitle,
+            views: postViews,
+            likes: postLikes || 0,
+            timestamp: timestamp
         };
-        console.log(giftId);
-        const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
+        const savedPosts = JSON.parse(localStorage.getItem('savedPosts') || '[]');
         
-        if(!savedGifts.some(g => g.id === gift.id))
-        {
-            console.log("ik werk tot hier");
-            savedGifts.push(gift);
-            localStorage.setItem('savedGifts', JSON.stringify(savedGifts));
+        if (!savedPosts.some(p => p.id === post.id)) {  // Comparing strings with strings
+            savedPosts.push(post);
+            localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
             loadSavedGifts();
+        } else {
+            alert('This post is already saved!');
         }
-        else
-        {
-            alert('This gift request has already been saved!');
-        }
-    }
-    catch(error)
-    {
-        console.error('Error saving gift list', error);
+    } catch (error) {
+        console.error('Error saving post:', error);
     }
 }
-function removeFromSaved(giftId)
-{
-    try
-    {
-        const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
-        const giftIdString = String(giftId);
-        const updatedGifts = savedGifts.filter(gift => gift.id !== giftIdString);
-        localStorage.setItem('savedGifts', JSON.stringify(updatedGifts));
+function removeFromSaved(postId) {
+
+    try {
+        const savedPosts = JSON.parse(localStorage.getItem('savedPosts') || '[]');
+        // Convert postId to string for consistent comparison
+        const postIdString = String(postId);
+        const updatedPosts = savedPosts.filter(post => post.id !== postIdString);
+        localStorage.setItem('savedPosts', JSON.stringify(updatedPosts));
         loadSavedGifts();
-    }
-    catch (error)
-    {
-        console.error('Error removing saved gift request:', error);
+    } catch (error) {
+        console.error('Error removing saved post:', error);
     }
 }
 
