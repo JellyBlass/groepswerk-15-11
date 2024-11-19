@@ -1,3 +1,18 @@
 {
-  "children": []
+  "children": [
+    {
+      "child": "Massimo",
+      "location": "Genk",
+      "goodieScore": 8,
+      "gift": "Wollen sokken, Quiche Vorm",
+      "id": "9957"
+    },
+    {
+      "id": "6b7d",
+      "child": "Seth",
+      "location": "Heusden",
+      "goodieScore": 8,
+      "gift": ""
+    }
+  ]
 }
