@@ -27,10 +27,31 @@
     width: 50%;
   }
 
-body {
-    background: rgb(10,122,93);
-    background: linear-gradient(135deg, rgba(10,122,93,1) 0%, rgba(194,56,82,1) 60%, rgba(227,51,56,1) 100%);
-    color: white;
+  body {
+
+    color: #ffffff;
+    background-image: url(images/background2.png);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+    overflow-y: hidden;
+}
+
+.btn-primary {
+    background-color: #b3cdf3;
+    border-color: #79aadf;
+}
+.btn-danger {
+    background-color: #0fb300;
+}
+.post-item {
+    background-color: #916c3863;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.post-item li {
+    font-weight: bold;
 }
 
 .box {
