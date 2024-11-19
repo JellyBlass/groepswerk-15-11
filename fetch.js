@@ -1,4 +1,4 @@
-const url = 'http://localhost:3000/posts';
+const url = 'http://localhost:3000/children';
 const output = document.getElementById('output');
 const savedOutput = document.getElementById('savedGifts');
 
@@ -27,6 +27,7 @@ function fetchdata()
                 output.innerHTML += `
                     <div class="post-item" id="post-${post.id}">
                         <span class="post-content">${post.child} (${post.location}) (goodie: ${post.goodieScore || 0})</span>
+                        <span class="post-content">${post.child} krijgt: ${post.gift}</span>
                         <div class="edit-form" style="display: none;">
                             <input type="text" class="edit-title" value="${post.child}">
                             <input type="text" class="edit-views" value="${post.location}">
@@ -34,9 +35,15 @@ function fetchdata()
                             <button class="smallbutton" onclick="saveEdit('${post.id}')">S</button>
                             <button class="smallbutton" onclick="cancelEdit('${post.id}')">X</button>
                         </div>
+                        <div class="add-gifts" style="display: none;">
+                            <input type="text" class="giftGoHere">
+                            <button class="smallbutton" onclick="addGiftToKid('${post.id}', '${post.gift}')">S</button>
+                            <button class="smallbutton" onclick="endEditing('${post.id}')">X</button>
+                        </div>
                         <div class="button-group">
+                            <button onclick="addGiftsToKid('${post.id}')">Geschenken toevoegen</button>
                             <button onclick="editPost('${post.id}')">Edit</button>
-                            <button onclick="saveToLocal('${post.id}', '${post.child}', '${post.toy}', ${post.numtoy || 0})">Save</button>
+                            <button onclick="saveToLocal('${post.id}', '${post.child}', '${post.location}', ${post.goodieScore || 0}, '${post.gift}')">Save</button>
                             <button onclick="deleteGifts('${post.id}')">Delete</button>
                         </div>
                     </div>
@@ -53,11 +60,13 @@ function saveEdit(id) {
     const newTitle = postDiv.querySelector('.edit-title').value;
     const newViews = postDiv.querySelector('.edit-views').value;
     const newLikes = parseInt(postDiv.querySelector('.edit-likes').value);
+    const newGift = postDiv.querySelector('.giftGoHere').value;
         // Create updated post object
         const updatedPost = {
             child: newTitle,
             location: newViews,
-            goodieScore: newLikes
+            goodieScore: newLikes,
+            gift: newGift
         };
     
         // Send PUT request to update the post
@@ -76,7 +85,55 @@ function saveEdit(id) {
         .catch(e => console.error('Error updating post:', e)); 
 }
 
+function addGiftToKid(id, giftsAlreadyAdded) {
+    // Get the edited values
+    const postDiv = document.getElementById(`post-${id}`);
+    const newTitle = postDiv.querySelector('.edit-title').value;
+    const newViews = postDiv.querySelector('.edit-views').value;
+    const newLikes = parseInt(postDiv.querySelector('.edit-likes').value);
+    let newGift = postDiv.querySelector('.giftGoHere').value;
 
+    console.log(giftsAlreadyAdded);
+        // Create updated post object
+        if(!giftsAlreadyAdded == ""){
+            newGift = giftsAlreadyAdded + ", " + newGift
+        }
+        const updatedPost = {
+            child: newTitle,
+            location: newViews,
+            goodieScore: newLikes,
+            gift: newGift
+        };
+    
+        // Send PUT request to update the post
+        fetch(`${url}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedPost)
+        })
+        .then(res => res.json())
+        .then(() => {
+            // Refresh the posts display
+            fetchdata();
+        })
+        .catch(e => console.error('Error updating post:', e)); 
+}
+
+function addGiftsToKid(id) {
+    // Show edit form and hide content for the selected post
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.add-gifts').style.display = 'block';
+    postDiv.querySelector('.button-group').style.display = 'none';
+}
+
+function endEditing(id) {
+    // Hide edit form and show content
+    const postDiv = document.getElementById(`post-${id}`);
+    postDiv.querySelector('.add-gifts').style.display = 'none';
+    postDiv.querySelector('.button-group').style.display = 'block';
+}
 
 function editPost(id) {
     // Show edit form and hide content for the selected post
@@ -120,35 +177,12 @@ function deleteGifts(id) {
     .catch(e => console.error('Error deleting gift:', e));
 }
 
-//gifts toevoegen
-function addGifts() {
-    const newPost = {
-        child: document.getElementById('namekid').value,
-        toy: document.getElementById('nametoy').value,
-        numtoy: parseInt(document.getElementById('gifts').value)
-    };
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newPost)
-    })
-    .then(res => res.json())
-    .then(() => {
-        fetchdata();
-        document.getElementById('namekid').value ='';
-        document.getElementById('nametoy').value = '';
-        document.getElementById('gifts').value = '';
-    })
-    .catch(e => console.error('Error adding gift list:', e));
-}
-
 function addChild() {
     const newPost = {
         child: document.getElementById('namekid').value,
         location: document.getElementById('location').value,
-        goodieScore: parseInt(document.getElementById('goodieScore').value)
+        goodieScore: parseInt(document.getElementById('goodieScore').value),
+        gift: ""
     };
     fetch(url, {
         method: 'POST',
@@ -190,6 +224,7 @@ function loadSavedGifts()
                 postDiv.className = 'post-item';
                 postDiv.innerHTML = `
                     <span>${post.title} (${post.views}) (${post.likes || 0})</span>
+                    <span>${post.giftstoShow}</span>
                     <button onclick="removeFromSaved('${post.id}')">Remove</button>
                 `;
                 savedOutput.appendChild(postDiv);
@@ -205,13 +240,14 @@ function loadSavedGifts()
     }
 }
 
-function saveToLocal(postId, namekid, nametoy, numtoy) {
+function saveToLocal(postId, namekid, nametoy, numtoy, gifts) {
     try {
         const post = {
             id: postId,  // postId is received as a string
             title: namekid,
             views: nametoy,
-            likes: numtoy
+            likes: numtoy,
+            giftstoShow: gifts
         };
         const savedGifts = JSON.parse(localStorage.getItem('savedGifts') || '[]');
         
